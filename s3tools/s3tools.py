@@ -45,9 +45,9 @@ def get_keys(prefix):
 
 def s3open(url_or_key, mode='rb'):
     if mode == 'rb':
-        return S3ReadBuffer(key)
+        return S3ReadBuffer(url_or_key)
     elif mode == 'wb':
-        return S3WriteBuffer(key)
+        return S3WriteBuffer(url_or_key)
     else:
         raise ValueError("Only modes 'rb' and 'wb' supported")
 
