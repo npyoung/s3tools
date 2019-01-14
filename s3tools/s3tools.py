@@ -12,9 +12,11 @@ _bucket = None
 _s3 = boto3.resource('s3')
 
 def set_bucket(bucket):
+    global _bucket
     _bucket = bucket
 
 def default_bucket():
+    global _bucket
     if _bucket:
         return _bucket
     
