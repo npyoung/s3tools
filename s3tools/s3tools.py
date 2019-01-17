@@ -42,8 +42,13 @@ def parse_url(url):
 
 
 def get_keys(prefix):
+    provided_prefix = prefix
     bucket, prefix = parse_url(prefix)
-    return [o.key for o in bucket.objects.filter(Prefix=prefix)]
+    keys = [o.key for o in bucket.objects.filter(Prefix=prefix)]
+    if provided_prefix[:5] == "s3://":
+        return ["s3://" + bucket.name + "/" + key for key in keys]
+    else:
+        return keys
 
 def s3open(url_or_key, mode='rb'):
     if mode == 'rb':
