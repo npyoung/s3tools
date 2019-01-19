@@ -5,7 +5,7 @@ import os
 import warnings
 
 import boto3
-from tifffile import imread, imsave
+from skimage.io import imread, imsave
 
 
 _bucket = None
