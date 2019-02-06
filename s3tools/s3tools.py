@@ -19,14 +19,14 @@ def default_bucket():
     global _bucket
     if _bucket:
         return _bucket
-    
+
     try:
         return os.environ['S3TOOLS_BUCKET']
     except KeyError as e:
         print("No bucket provided and neither `s3tools.set_bucket()` nor `S3TOOLS_BUCKET` have been set.")
         print("Please provide a way to determine the S3 bucket")
         raise e
-    
+
 
 def parse_url(url):
     # Full S3 URL provided
@@ -61,16 +61,16 @@ def s3open(url_or_key, mode='rb'):
 @contextmanager
 def S3ReadBuffer(url_or_key):
     bucket, key = parse_url(url_or_key)
-    
+
     with BytesIO() as buff:
         bucket.download_fileobj(key, buff)
         buff.seek(0)
         yield buff
-        
+
 @contextmanager
 def S3WriteBuffer(url_or_key):
     bucket, key = parse_url(url_or_key)
-    
+
     with BytesIO() as buff:
         yield buff
         buff.seek(0)
@@ -92,8 +92,11 @@ def put_s3_file(key, text):
         buff.write(text)
 
 def put_s3_img(key, img):
+    plugin = None
+    if key.lower().endswith(('.tiff', '.tif')):
+        plugin = 'tifffile'
     with s3open(key, 'wb') as buff:
-        imsave(buff, img, compress=6)
+        imsave(buff, img, plugin=plugin, compress=6)
 
 def expand_pattern(filename):
     if filename[:3] == "s3:":
