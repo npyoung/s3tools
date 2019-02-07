@@ -96,7 +96,9 @@ def put_s3_img(key, img):
     if key.lower().endswith(('.tiff', '.tif')):
         plugin = 'tifffile'
     with s3open(key, 'wb') as buff:
-        imsave(buff, img, plugin=plugin, compress=6)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message='.+ is a low contrast image')
+            imsave(buff, img, plugin=plugin, compress=6)
 
 def expand_pattern(filename):
     if filename[:3] == "s3:":
