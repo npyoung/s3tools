@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from glob import glob
 from io import BytesIO, StringIO
+import logging
 import os
 import warnings
 
@@ -10,6 +11,8 @@ from skimage.io import imread, imsave
 
 _bucket = None
 _s3 = boto3.resource('s3')
+
+logging.getLogger("botocore.vendored.requests.packages.urllib3.connectionpool").setLevel(logging.WARNING)
 
 def set_bucket(bucket):
     global _bucket
