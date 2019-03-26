@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from glob import glob
 from io import BytesIO, StringIO
 import logging
+from tempfile import gettempdir
 import os
 import warnings
 
@@ -53,13 +54,22 @@ def get_keys(prefix):
     else:
         return keys
 
-def s3open(url_or_key, mode='rb'):
-    if mode == 'rb':
-        return S3ReadBuffer(url_or_key)
-    elif mode == 'wb':
-        return S3WriteBuffer(url_or_key)
+def s3open(url_or_key, mode='rb', backend='memory'):
+    if backend == 'memory':
+        if mode == 'rb':
+            return S3ReadBuffer(url_or_key)
+        elif mode == 'wb':
+            return S3WriteBuffer(url_or_key)
+        else:
+            raise ValueError("Only modes 'rb' and 'wb' supported")
+    elif backend == 'file':
+        bucket, key = parse_url(url_or_key)
+        fname = key.rsplit("/", 1)[-1]
+        fname = os.path.join(gettempdir(), fname)
+        bucket.download_file(key, fname)
+        return open(fname, mode='rb')
     else:
-        raise ValueError("Only modes 'rb' and 'wb' supported")
+        raise ValueError("Backend must be one of 'memory' or 'file'")
 
 @contextmanager
 def S3ReadBuffer(url_or_key):
@@ -83,8 +93,8 @@ def get_s3_file(key):
     with s3open(key, 'rb') as buff:
         return buff.read()
 
-def get_s3_img(key):
-    with s3open(key, 'rb') as buff:
+def get_s3_img(key, backend='memory'):
+    with s3open(key, 'rb', backend=backend) as buff:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message='ome-xml')
             img = imread(buff)
@@ -94,11 +104,11 @@ def put_s3_file(key, text):
     with s3open(key, 'wb') as buff:
         buff.write(text)
 
-def put_s3_img(key, img):
+def put_s3_img(key, img, backend='memory'):
     plugin = None
     if key.lower().endswith(('.tiff', '.tif')):
         plugin = 'tifffile'
-    with s3open(key, 'wb') as buff:
+    with s3open(key, 'wb', backend=backend) as buff:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message='.+ is a low contrast image')
             imsave(buff, img, plugin=plugin, compress=6)
