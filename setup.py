@@ -9,4 +9,8 @@ setup(
     author_email="noahpyoung@gmail.com",
     url="https://github.com/npyoung/s3tools",
     packages=['s3tools'],
+    install_requires=[
+        'boto3',
+        'scikit-image',
+    ]
 )
