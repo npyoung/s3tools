@@ -6,7 +6,7 @@ import os
 import warnings
 
 import boto3
-from skimage.io import imread, imsave
+from tifffile import imread, imsave
 
 
 _bucket = None
@@ -95,13 +95,10 @@ def put_s3_file(key, text):
         buff.write(text)
 
 def put_s3_img(key, img):
-    plugin = None
-    if key.lower().endswith(('.tiff', '.tif')):
-        plugin = 'tifffile'
     with s3open(key, 'wb') as buff:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message='.+ is a low contrast image')
-            imsave(buff, img, plugin=plugin, compress=6)
+            imsave(buff, img, compress=6)
 
 def expand_pattern(filename):
     if filename[:3] == "s3:":
