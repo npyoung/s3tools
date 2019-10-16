@@ -81,13 +81,13 @@ def S3ReadBuffer(url_or_key):
         yield buff
 
 @contextmanager
-def S3WriteBuffer(url_or_key):
+def S3WriteBuffer(url_or_key, extra_args=None):
     bucket, key = parse_url(url_or_key)
 
     with BytesIO() as buff:
         yield buff
         buff.seek(0)
-        bucket.upload_fileobj(buff, key)
+        bucket.upload_fileobj(buff, key, ExtraArgs=extra_args)
 
 def get_s3_file(key):
     with s3open(key, 'rb') as buff:
