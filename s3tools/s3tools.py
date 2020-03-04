@@ -45,6 +45,20 @@ def parse_url(url):
     return _s3.Bucket(bucket), key
 
 
+def s3_dirname(path):
+    dir, _ = path.rsplit('/', 1)
+    return dir
+
+
+def s3_basename(path):
+    _, base = path.rsplit('/', 1)
+    return base
+
+
+def s3_join(part1, part2):
+    return part1.rstrip('/') + '/' + part2.lstrip('/')
+
+
 def get_keys(prefix):
     provided_prefix = prefix
     bucket, prefix = parse_url(prefix)
