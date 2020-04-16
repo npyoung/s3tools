@@ -11,6 +11,6 @@ setup(
     packages=['s3tools'],
     install_requires=[
         'boto3',
-        'scikit-image',
+        'tifffile'
     ]
 )
