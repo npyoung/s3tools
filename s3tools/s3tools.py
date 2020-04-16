@@ -116,9 +116,9 @@ def put_s3_file(key, text):
     with s3open(key, 'wb') as buff:
         buff.write(text)
 
-def put_s3_img(key, img):
+def put_s3_img(key, img, **kwargs):
     with s3open(key, 'wb') as buff:
-        imsave(buff, img, compress=6)
+        imsave(buff, img, compress=6, **kwargs)
 
 def expand_pattern(filename):
     if filename[:3] == "s3:":
